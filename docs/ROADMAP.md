@@ -11,6 +11,19 @@ Ce qui fonctionne aujourd'hui, de bout en bout :
   depuis l'application
 - rapport détaillé, exportable en PDF ; suivi pluri-mensuel ; export du dossier en JSON
 - analyse intégralement locale, sans compte ni serveur
+- assistant conversationnel optionnel (Claude, en apportez-votre-clé) qui explique le
+  rapport et retient les informations données en langage naturel — voir README, section
+  « L'assistant conversationnel »
+
+## 0. Fait — le premier appel réseau, cadré et documenté
+
+L'assistant conversationnel a introduit ce que ce document appelait « le premier appel
+réseau de l'application ». La directive `connect-src` de la politique de sécurité de
+contenu a été élargie au seul domaine `api.anthropic.com`, et la page Confidentialité
+documente précisément ce que cela change. Le choix retenu — apportez votre propre clé,
+appel direct du navigateur vers Anthropic, rien par défaut — évite d'avoir besoin d'un
+backend à nous, et donc de choisir un hébergeur pour une fonction serverless : la clé de
+chaque utilisateur ne transite jamais par un serveur PaieAI.
 
 ## 1. Rendre l'abonnement réel
 
@@ -28,10 +41,9 @@ Un Cloudflare Worker, gratuit dans les volumes attendus. Stripe encaisse et éme
 licence signée ; la fonction vérifie la signature ; le navigateur conserve le jeton.
 Aucun bulletin ne transite : seule la licence circule.
 
-Attention : cet appel serait le **premier** appel réseau de l'application. Il faudra
-élargir la directive `connect-src` de la politique de sécurité de contenu au seul
-domaine de vérification, et le mentionner sur la page Confidentialité. C'est une
-concession réelle au modèle actuel, à documenter plutôt qu'à dissimuler.
+Il faudra élargir une nouvelle fois `connect-src` au domaine du Worker, en suivant le
+même principe que pour l'assistant : une exception nommément déclarée et documentée,
+jamais une ouverture générale.
 
 **Option B — licence signée hors ligne.**
 Une paire de clés asymétriques : la clé privée signe les licences lors de l'achat, la clé

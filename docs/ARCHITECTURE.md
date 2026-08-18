@@ -23,6 +23,15 @@ La contrepartie est réelle et assumée : pas de synchronisation entre appareils
 sauvegarde de secours, et un contrôle d'abonnement qui ne peut pas être appliqué côté
 serveur. Voir [ROADMAP.md](ROADMAP.md).
 
+**Exception unique, volontaire et documentée :** l'assistant conversationnel
+(`src/lib/ai.ts`) appelle l'API d'Anthropic directement depuis le navigateur, avec une
+clé que chaque utilisateur fournit lui-même (BYOK — *bring your own key*). Ce choix évite
+d'introduire un serveur à nous : il n'y a rien à héberger, rien qu'un attaquant pourrait
+siphonner puisqu'aucune clé partagée n'existe. La politique de sécurité de contenu
+autorise nommément `api.anthropic.com` en plus de `'self'` pour cette seule raison, et
+rien ne part tant que l'utilisateur n'a pas lui-même activé la fonctionnalité. Le
+raisonnement complet est dans le README, section « L'assistant conversationnel ».
+
 ## Découpage
 
 ```

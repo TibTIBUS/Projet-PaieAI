@@ -7,10 +7,12 @@ en vigueur **le mois concerné**, et chiffre en euros ce qu'une anomalie coûte 
 salarié — sur le mois, puis sur les trois années de prescription des salaires
 (article L.3245-1 du Code du travail).
 
-**Tout s'exécute dans le navigateur.** Aucun bulletin n'est téléversé, aucun compte
-n'est requis, aucune donnée ne transite par un serveur. Ce n'est pas une limitation
-technique mais le cœur du produit : un bulletin de paie est une donnée personnelle
-sensible, et la meilleure garantie que l'on puisse offrir est de ne pas la collecter.
+**Tout s'exécute dans le navigateur, par défaut.** Aucun bulletin n'est téléversé,
+aucun compte n'est requis, aucune donnée ne transite par un serveur. Ce n'est pas une
+limitation technique mais le cœur du produit : un bulletin de paie est une donnée
+personnelle sensible, et la meilleure garantie que l'on puisse offrir est de ne pas la
+collecter. Une seule fonctionnalité optionnelle déroge à cette règle — l'assistant
+conversationnel, décrit plus bas — et seulement si l'utilisateur l'active lui-même.
 
 ## Ce que fait l'outil
 
@@ -21,6 +23,36 @@ sensible, et la meilleure garantie que l'on puisse offrir est de ne pas la colle
   incohérent — ce qu'un bulletin isolé ne peut pas révéler
 - **Rapport transmissible** : chaque constat cite le texte applicable, exportable en PDF
   pour le service paie, un expert-comptable ou un conseil
+- **Assistant conversationnel (optionnel)** : explique le rapport en langage courant et
+  retient au fil de la discussion les informations que le moteur ne peut pas lire sur le
+  bulletin (effectif, minimum conventionnel…), au lieu de les demander dans un formulaire
+
+## L'assistant conversationnel
+
+Sur chaque rapport, un bouton « Activer l'assistant » ouvre une conversation en langage
+naturel. Il ne calcule rien et n'invente aucun taux ni article de loi : il reçoit les
+résultats déjà produits par le moteur déterministe et se contente de les expliquer, de
+répondre aux questions, et de mémoriser ce que l'utilisateur lui dit sur sa situation
+(via un appel d'outil qui met à jour les mêmes paramètres que l'écran *Paramètres*).
+
+C'est la seule fonctionnalité de l'application qui communique avec l'extérieur, et elle
+est strictement volontaire :
+
+- **Fonctionnement « apportez votre clé » (BYOK)** : chaque personne colle sa propre clé
+  API Anthropic (obtenue sur [console.anthropic.com](https://console.anthropic.com/settings/keys)),
+  conservée uniquement dans le stockage local de son navigateur. Aucune clé partagée ne
+  transite par un serveur à nous — c'est le seul modèle compatible avec une application
+  100 % statique, sans backend, et c'est ce qui a permis de garder GitHub Pages comme
+  hébergement sans rien changer d'autre à l'architecture.
+- **Rien par défaut** : la politique de sécurité de contenu n'autorise qu'une seule
+  destination hors de l'application (`api.anthropic.com`), et aucune requête ne part tant
+  qu'aucune clé n'a été saisie.
+- **Coût à la charge de l'utilisateur** : chaque question est facturée par Anthropic
+  directement au titulaire de la clé, de l'ordre de quelques centimes. PaieAI ne
+  facture rien pour cette fonctionnalité et n'en tire aucune marge.
+
+La page *Confidentialité* de l'application (menu bas de page) détaille précisément ce
+que cette fonctionnalité change une fois activée.
 
 ## Démarrage
 
@@ -108,7 +140,7 @@ npm run build                            # racine : https://exemple.fr/
 VITE_BASE=/Projet-PaieAI/ npm run build  # sous-chemin : https://compte.github.io/Projet-PaieAI/
 ```
 
-### Aucune ressource externe
+### Quasiment aucune ressource externe
 
 L'application ne charge rien depuis un tiers : la police de caractères est auto-hébergée,
 et le moteur de reconnaissance optique — habituellement récupéré depuis un CDN — est copié
@@ -116,9 +148,12 @@ depuis `node_modules` vers `public/tesseract/` avant chaque build (`npm run ress
 exécuté automatiquement par `prebuild`).
 
 Une politique de sécurité de contenu déclarée dans [`index.html`](index.html) verrouille ce
-comportement : `connect-src 'self'` interdit au navigateur toute connexion sortante. La
-promesse « vos bulletins ne quittent pas votre appareil » devient ainsi une règle appliquée
-par le navigateur, qu'une régression du code ferait échouer visiblement.
+comportement : `connect-src` n'autorise que l'application elle-même (`'self'`) et, à titre
+de seule exception nommément déclarée, `api.anthropic.com` pour l'assistant conversationnel
+optionnel décrit plus haut — jamais sollicité tant qu'aucune clé n'est renseignée. La
+promesse « vos bulletins ne quittent pas votre appareil, sauf si vous choisissez le
+contraire » devient ainsi une règle appliquée par le navigateur, qu'une régression du code
+ferait échouer visiblement.
 
 ## Feuille de route
 

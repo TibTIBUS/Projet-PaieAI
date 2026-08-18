@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { AlertTriangle, Check, RotateCcw } from 'lucide-react';
+import { AlertTriangle, Check, ChevronDown, ChevronUp, RotateCcw, Sparkles, Trash2 } from 'lucide-react';
 import { DERNIERE_PERIODE_VERIFIEE, PERIODES, appliquerSurcharges } from '@/domain/referentiel';
 import { effacerToutesLesDonnees, usePaieAI } from '@/lib/storage';
 import { euros, nombre } from '@/lib/format';
@@ -63,56 +63,99 @@ export function Parametres() {
   const definirOptions = usePaieAI((e) => e.definirOptions);
   const surcharges = usePaieAI((e) => e.surcharges);
   const definirSurcharges = usePaieAI((e) => e.definirSurcharges);
+  const cleApiIA = usePaieAI((e) => e.cleApiIA);
+  const definirCleApiIA = usePaieAI((e) => e.definirCleApiIA);
   const alsaceMoselle = options.alsaceMoselle ?? false;
+  const [formulaireOuvert, setFormulaireOuvert] = useState(false);
+
+  const nombreRenseignes = CHAMPS.filter((c) => options[c.cle] !== undefined).length
+    + (alsaceMoselle ? 1 : 0);
 
   return (
     <div className="space-y-10">
       <section>
         <TitreSection
           titre="Vos informations"
-          sousTitre="Ces éléments ne figurent pas toujours sur le bulletin. Chacun débloque un ou plusieurs contrôles."
+          sousTitre="Certains contrôles ont besoin d’une précision absente du bulletin (effectif, minimum conventionnel, temps partiel…). Deux façons de les donner, au choix."
         />
-        <Carte className="p-5">
-          <div className="grid gap-5 sm:grid-cols-2">
-            {CHAMPS.map((champ) => (
-              <div key={champ.cle}>
-                <label className="etiquette" htmlFor={champ.cle}>
-                  {champ.libelle} <span className="font-normal text-ink-mute">({champ.unite})</span>
-                </label>
-                <input
-                  id={champ.cle}
-                  type="number"
-                  step={champ.pas}
-                  min="0"
-                  className="champ tabulaire"
-                  value={options[champ.cle] ?? ''}
-                  placeholder="Non renseigné"
-                  onChange={(e) => definirOptions({
-                    [champ.cle]: e.target.value === '' ? undefined : Number(e.target.value),
-                  })}
-                />
-                <p className="mt-1 text-xs leading-relaxed text-ink-mute">{champ.aide}</p>
-              </div>
-            ))}
-          </div>
 
-          <label className="mt-6 flex items-start gap-3 rounded-lg bg-slate-50 p-3 text-sm">
-            <input
-              type="checkbox"
-              className="mt-0.5"
-              checked={alsaceMoselle}
-              onChange={(e) => definirOptions({ alsaceMoselle: e.target.checked })}
-            />
-            <span>
-              <span className="font-medium">Établissement en Alsace-Moselle</span>
-              <span className="block text-ink-mute">
-                Bas-Rhin, Haut-Rhin ou Moselle : le régime local prévoit une cotisation salariale
-                maladie supplémentaire de 1,30 %, légitime dans ce cas seulement.
-              </span>
+        <Carte className="mb-4 flex flex-wrap items-center justify-between gap-4 p-5">
+          <div className="flex items-start gap-3">
+            <Sparkles size={20} className="mt-0.5 shrink-0 text-brand-600" />
+            <div>
+              <p className="font-semibold">Le plus simple : le dire à l’assistant</p>
+              <p className="text-sm text-ink-mute">
+                Ouvrez un rapport et dites-lui par exemple « je suis en Alsace » ou « l’entreprise
+                compte 40 salariés » : il retient l’information tout seul, au fil de la conversation.
+              </p>
+            </div>
+          </div>
+          {cleApiIA && (
+            <span className="inline-flex shrink-0 items-center gap-1 rounded-md bg-emerald-50 px-2 py-1 text-xs font-semibold text-emerald-700">
+              <Check size={13} /> Assistant activé
             </span>
-          </label>
+          )}
         </Carte>
+
+        <button
+          type="button"
+          className="mb-4 inline-flex items-center gap-1.5 text-sm font-medium text-brand-700 hover:text-brand-800"
+          onClick={() => setFormulaireOuvert((o) => !o)}
+        >
+          Ou saisir moi-même les informations
+          {nombreRenseignes > 0 && (
+            <span className="rounded bg-slate-200 px-1.5 text-xs tabulaire text-ink-soft">
+              {nombreRenseignes} renseignée(s)
+            </span>
+          )}
+          {formulaireOuvert ? <ChevronUp size={16} /> : <ChevronDown size={16} />}
+        </button>
+
+        {formulaireOuvert && (
+          <Carte className="p-5">
+            <div className="grid gap-5 sm:grid-cols-2">
+              {CHAMPS.map((champ) => (
+                <div key={champ.cle}>
+                  <label className="etiquette" htmlFor={champ.cle}>
+                    {champ.libelle} <span className="font-normal text-ink-mute">({champ.unite})</span>
+                  </label>
+                  <input
+                    id={champ.cle}
+                    type="number"
+                    step={champ.pas}
+                    min="0"
+                    className="champ tabulaire"
+                    value={options[champ.cle] ?? ''}
+                    placeholder="Non renseigné"
+                    onChange={(e) => definirOptions({
+                      [champ.cle]: e.target.value === '' ? undefined : Number(e.target.value),
+                    })}
+                  />
+                  <p className="mt-1 text-xs leading-relaxed text-ink-mute">{champ.aide}</p>
+                </div>
+              ))}
+            </div>
+
+            <label className="mt-6 flex items-start gap-3 rounded-lg bg-slate-50 p-3 text-sm">
+              <input
+                type="checkbox"
+                className="mt-0.5"
+                checked={alsaceMoselle}
+                onChange={(e) => definirOptions({ alsaceMoselle: e.target.checked })}
+              />
+              <span>
+                <span className="font-medium">Établissement en Alsace-Moselle</span>
+                <span className="block text-ink-mute">
+                  Bas-Rhin, Haut-Rhin ou Moselle : le régime local prévoit une cotisation salariale
+                  maladie supplémentaire de 1,30 %, légitime dans ce cas seulement.
+                </span>
+              </span>
+            </label>
+          </Carte>
+        )}
       </section>
+
+      <SectionAssistant cleApiIA={cleApiIA} definirCleApiIA={definirCleApiIA} />
 
       <SectionReferentiel surcharges={surcharges} definirSurcharges={definirSurcharges} />
 
@@ -143,6 +186,49 @@ export function Parametres() {
 }
 
 /* ------------------------------------------------------------------ */
+
+function SectionAssistant({
+  cleApiIA, definirCleApiIA,
+}: { cleApiIA?: string; definirCleApiIA: (cle: string | undefined) => void }) {
+  return (
+    <section>
+      <TitreSection
+        titre="Assistant IA"
+        sousTitre="Optionnel. Explique vos rapports en langage courant et retient ce que vous lui dites sur votre situation."
+      />
+      <Carte className="p-5">
+        {cleApiIA ? (
+          <div className="flex flex-wrap items-center justify-between gap-3">
+            <div>
+              <p className="font-medium">Assistant activé</p>
+              <p className="text-sm text-ink-mute">
+                Votre clé est enregistrée dans ce navigateur uniquement. Vous pouvez la retirer à
+                tout moment : l’assistant redeviendra inactif.
+              </p>
+            </div>
+            <button
+              type="button"
+              className="bouton-secondaire !border-rose-300 !text-rose-700 hover:!bg-rose-50"
+              onClick={() => {
+                if (window.confirm('Retirer votre clé API ? L’assistant sera désactivé.')) {
+                  definirCleApiIA(undefined);
+                }
+              }}
+            >
+              <Trash2 size={16} /> Retirer la clé
+            </button>
+          </div>
+        ) : (
+          <p className="text-sm text-ink-soft">
+            L’assistant n’est pas activé. Ouvrez le rapport d’un bulletin pour l’activer : vous y
+            trouverez le champ pour coller votre clé API, avec une explication claire de ce que
+            cela change en matière de confidentialité.
+          </p>
+        )}
+      </Carte>
+    </section>
+  );
+}
 
 function SectionReferentiel({
   surcharges, definirSurcharges,

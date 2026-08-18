@@ -3,6 +3,7 @@ import { persist } from 'zustand/middleware';
 import type { Bulletin } from '@/domain/types';
 import type { SurchargesReferentiel } from '@/domain/referentiel';
 import type { OptionsAnalyse } from '@/domain/engine';
+import type { MessageChat } from './ai';
 
 /**
  * État de l'application.
@@ -28,6 +29,15 @@ export interface EtatPaieAI {
   /** L'utilisateur a-t-il pris connaissance de l'avertissement d'usage ? */
   avertissementLu: boolean;
 
+  /**
+   * Clé API Anthropic saisie par l'utilisateur pour activer l'assistant.
+   * Conservée uniquement dans ce navigateur — jamais transmise ailleurs qu'à
+   * l'API d'Anthropic, et seulement au moment où l'assistant est sollicité.
+   */
+  cleApiIA?: string;
+  /** Historique de conversation avec l'assistant, par bulletin. */
+  chatParBulletin: Record<string, MessageChat[]>;
+
   ajouterBulletin: (bulletin: Bulletin) => void;
   remplacerBulletin: (bulletin: Bulletin) => void;
   supprimerBulletin: (id: string) => void;
@@ -36,6 +46,9 @@ export interface EtatPaieAI {
   definirSurcharges: (surcharges: SurchargesReferentiel) => void;
   definirPlan: (plan: Plan, cle?: string) => void;
   marquerAvertissementLu: () => void;
+  definirCleApiIA: (cle: string | undefined) => void;
+  ajouterMessageChat: (bulletinId: string, message: MessageChat) => void;
+  viderChat: (bulletinId: string) => void;
 }
 
 /** Le texte brut n'est conservé que pour le contrôle des mentions obligatoires. */
@@ -54,6 +67,7 @@ export const usePaieAI = create<EtatPaieAI>()(
       surcharges: {},
       plan: 'gratuit',
       avertissementLu: false,
+      chatParBulletin: {},
 
       ajouterBulletin: (bulletin) =>
         set((etat) => {
@@ -87,6 +101,22 @@ export const usePaieAI = create<EtatPaieAI>()(
       definirPlan: (plan, cleAbonnement) => set({ plan, cleAbonnement }),
 
       marquerAvertissementLu: () => set({ avertissementLu: true }),
+
+      definirCleApiIA: (cleApiIA) => set({ cleApiIA }),
+
+      ajouterMessageChat: (bulletinId, message) =>
+        set((etat) => ({
+          chatParBulletin: {
+            ...etat.chatParBulletin,
+            [bulletinId]: [...(etat.chatParBulletin[bulletinId] ?? []), message],
+          },
+        })),
+
+      viderChat: (bulletinId) =>
+        set((etat) => {
+          const { [bulletinId]: _supprime, ...reste } = etat.chatParBulletin;
+          return { chatParBulletin: reste };
+        }),
     }),
     {
       name: 'paieai-v1',
@@ -98,6 +128,8 @@ export const usePaieAI = create<EtatPaieAI>()(
         plan: etat.plan,
         cleAbonnement: etat.cleAbonnement,
         avertissementLu: etat.avertissementLu,
+        cleApiIA: etat.cleApiIA,
+        chatParBulletin: etat.chatParBulletin,
       }),
     },
   ),

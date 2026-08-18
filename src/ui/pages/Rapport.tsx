@@ -6,6 +6,7 @@ import { parametresPour } from '@/domain/referentiel';
 import { usePaieAI } from '@/lib/storage';
 import { euros, moisAnnee, nombre } from '@/lib/format';
 import { exporterRapportPdf, telecharger } from '@/lib/export';
+import { Assistant } from '@/ui/components/Assistant';
 import { CarteAnomalie } from '@/ui/components/CarteAnomalie';
 import { Jauge, libelleScore } from '@/ui/components/Jauge';
 import { Alerte, Carte, Statistique, TitreSection, Vide } from '@/ui/components/primitives';
@@ -103,6 +104,8 @@ export function Rapport() {
           />
         </div>
       </div>
+
+      <Assistant bulletin={bulletin} resultat={resultat} />
 
       <section>
         <TitreSection

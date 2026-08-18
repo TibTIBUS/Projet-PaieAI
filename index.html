@@ -19,6 +19,11 @@
       s'exécute en WebAssembly. `frame-ancestors` n'est pas pris en compte dans une
       balise meta : il faudra un en-tête HTTP pour interdire réellement l'inclusion
       dans une iframe, ce que GitHub Pages ne permet pas de configurer.
+
+      Seule exception à `connect-src 'self'` : api.anthropic.com, nécessaire à
+      l'assistant conversationnel optionnel (src/lib/ai.ts). Cette connexion ne
+      part que si l'utilisateur a lui-même collé sa clé API et engagé une
+      conversation — jamais par défaut. Voir docs/ARCHITECTURE.md.
     -->
     <meta
       http-equiv="Content-Security-Policy"
@@ -31,7 +36,7 @@
                style-src 'self' 'unsafe-inline';
                script-src 'self' 'wasm-unsafe-eval' blob:;
                worker-src 'self' blob:;
-               connect-src 'self' blob: data:;"
+               connect-src 'self' blob: data: https://api.anthropic.com;"
     />
   </head>
   <body class="bg-slate-50 text-ink antialiased">
