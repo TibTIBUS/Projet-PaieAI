@@ -33,9 +33,9 @@ jobs:
       - name: Configurer Pages
         id: pages
         uses: actions/configure-pages@v5
-        with:
-          # Active GitHub Pages sur le dépôt si ce n'est pas déjà fait.
-          enablement: true
+        # GitHub Pages doit être activé une fois, à la main, dans les
+        # paramètres du dépôt (Settings → Pages → Source : GitHub Actions).
+        # Le jeton du workflow n'a pas la permission de le faire lui-même.
 
       - name: Construire
         run: npm run build

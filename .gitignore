@@ -8,3 +8,4 @@ dist-ssr
 .vite
 coverage
 public/tesseract/
+tsconfig.tsbuildinfo
