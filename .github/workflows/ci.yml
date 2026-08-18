@@ -1,0 +1,39 @@
+name: Intégration continue
+
+on:
+  push:
+    branches: ['**']
+  pull_request:
+
+jobs:
+  verifier:
+    name: Types, tests et build
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: npm
+
+      - name: Installer les dépendances
+        run: npm ci
+
+      - name: Vérifier les types
+        run: npx tsc --noEmit
+
+      - name: Exécuter les tests
+        run: npm test
+
+      - name: Construire le site
+        run: npm run build
+
+      - name: Vérifier que le catalogue des contrôles est à jour
+        run: |
+          npm run docs
+          if ! git diff --quiet -- docs/CONTROLES.md; then
+            echo "::error::docs/CONTROLES.md est obsolète. Exécutez 'npm run docs' et validez le résultat."
+            git diff -- docs/CONTROLES.md
+            exit 1
+          fi
