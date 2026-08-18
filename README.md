@@ -79,8 +79,8 @@ Le protocole de validation par un expert-comptable est décrit dans
 
 ## Déploiement
 
-Le site est un ensemble de fichiers statiques : n'importe quel hébergeur gratuit convient.
-Deux cibles sont préconfigurées.
+Le site est un ensemble de fichiers statiques, sans dépendance à aucun service externe :
+n'importe quel hébergeur statique convient.
 
 ### GitHub Pages (gratuit sur dépôt public)
 
@@ -98,13 +98,6 @@ Deux prérequis, à faire une fois :
 
 Le site est ensuite servi sur `https://<compte>.github.io/Projet-PaieAI/`.
 
-### Netlify
-
-La configuration est déjà dans [`netlify.toml`](netlify.toml) : commande `npm run build`,
-dossier publié `dist`, redirection SPA et en-têtes de sécurité inclus. Connectez le dépôt
-sur [netlify.com](https://app.netlify.com/start) — aucun réglage supplémentaire, et le
-site est servi depuis la racine du domaine.
-
 ### Chemin de base
 
 Le build lit la variable `VITE_BASE` (`/` par défaut) : c'est ce qui permet au même code
@@ -114,6 +107,18 @@ de fonctionner à la racine d'un domaine comme sous un sous-chemin.
 npm run build                            # racine : https://exemple.fr/
 VITE_BASE=/Projet-PaieAI/ npm run build  # sous-chemin : https://compte.github.io/Projet-PaieAI/
 ```
+
+### Aucune ressource externe
+
+L'application ne charge rien depuis un tiers : la police de caractères est auto-hébergée,
+et le moteur de reconnaissance optique — habituellement récupéré depuis un CDN — est copié
+depuis `node_modules` vers `public/tesseract/` avant chaque build (`npm run ressources`,
+exécuté automatiquement par `prebuild`).
+
+Une politique de sécurité de contenu déclarée dans [`index.html`](index.html) verrouille ce
+comportement : `connect-src 'self'` interdit au navigateur toute connexion sortante. La
+promesse « vos bulletins ne quittent pas votre appareil » devient ainsi une règle appliquée
+par le navigateur, qu'une régression du code ferait échouer visiblement.
 
 ## Feuille de route
 

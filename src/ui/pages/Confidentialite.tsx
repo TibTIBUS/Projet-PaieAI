@@ -14,8 +14,10 @@ export function Confidentialite() {
           <p>
             L’intégralité du traitement — lecture du PDF, reconnaissance optique éventuelle, analyse,
             production du rapport — s’exécute dans votre navigateur. Aucun fichier, aucun montant,
-            aucune donnée d’identification n’est envoyé à un serveur. Vous pouvez le vérifier :
-            l’application fonctionne hors connexion une fois chargée, et son code source est public.
+            aucune donnée d’identification n’est envoyé à un serveur. Vous pouvez le vérifier
+            vous-même : ouvrez l’onglet « Réseau » des outils de développement et analysez un
+            bulletin — aucune requête ne part. L’application fonctionne d’ailleurs entièrement hors
+            connexion une fois chargée, et son code source est public.
           </p>
         </section>
 
@@ -30,12 +32,19 @@ export function Confidentialite() {
         </section>
 
         <section>
-          <h2 className="mb-2 text-base font-semibold text-ink">Ni compte, ni traceur</h2>
+          <h2 className="mb-2 text-base font-semibold text-ink">Ni compte, ni traceur, ni requête sortante</h2>
           <p>
             L’application ne demande pas de compte, ne dépose pas de cookie de mesure d’audience et
-            n’intègre aucun script tiers de suivi. Les polices de caractères sont chargées depuis
-            Google Fonts ; si vous préférez l’éviter, l’application reste lisible avec les polices
-            de votre système.
+            n’intègre aucun script tiers. Tout ce dont elle a besoin est servi depuis son propre
+            domaine : la police de caractères, et jusqu’au moteur de reconnaissance optique et à son
+            dictionnaire français, qui sont ailleurs habituellement chargés depuis un service externe.
+          </p>
+          <p className="mt-2">
+            Cette absence de requête sortante n’est pas seulement une intention : l’application
+            déclare une politique de sécurité de contenu dont la directive{' '}
+            <code className="rounded bg-slate-100 px-1 py-0.5 text-xs">connect-src &apos;self&apos;</code>{' '}
+            interdit au navigateur toute connexion vers un autre domaine. Si une future version
+            tentait d’envoyer quoi que ce soit, le navigateur bloquerait la requête.
           </p>
         </section>
 

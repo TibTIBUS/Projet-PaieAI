@@ -21,7 +21,18 @@ export async function extraireTexteParOcr(
   surProgression?: (p: ProgressionOcr) => void,
 ): Promise<string[]> {
   const { createWorker } = await import('tesseract.js');
+
+  // Les ressources sont servies depuis notre propre origine plutôt que depuis
+  // un CDN : l'application n'émet ainsi aucune requête vers un tiers, ce que la
+  // politique de sécurité de contenu interdit d'ailleurs explicitement.
+  const racine = `${import.meta.env.BASE_URL}tesseract/`;
+
   const worker = await createWorker('fra', 1, {
+    workerPath: `${racine}worker.min.js`,
+    corePath: racine,
+    langPath: racine,
+    // Le fichier de langue est déjà présent : inutile de tenter un cache.
+    cacheMethod: 'none',
     logger: (message: { status: string; progress: number }) => {
       if (message.status === 'recognizing text') {
         surProgression?.({ page: 0, totalPages, avancement: message.progress });

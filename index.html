@@ -7,9 +7,32 @@
     <meta name="description" content="PaieAI analyse vos bulletins de paie, détecte les erreurs de cotisations, de SMIC, d'heures supplémentaires et de net imposable. Analyse 100 % locale, vos données ne quittent jamais votre navigateur." />
     <meta name="theme-color" content="#1f66f0" />
     <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
-    <link rel="preconnect" href="https://fonts.googleapis.com" />
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+    <!--
+      Politique de sécurité de contenu.
+
+      `connect-src 'self'` est la ligne essentielle : elle interdit au navigateur
+      toute requête vers un autre domaine. La promesse « vos bulletins ne quittent
+      pas votre appareil » cesse d'être une affirmation pour devenir une règle que
+      le navigateur applique — et qu'une régression du code ferait échouer bruyamment.
+
+      `'wasm-unsafe-eval'` est requis par le moteur de reconnaissance optique, qui
+      s'exécute en WebAssembly. `frame-ancestors` n'est pas pris en compte dans une
+      balise meta : il faudra un en-tête HTTP pour interdire réellement l'inclusion
+      dans une iframe, ce que GitHub Pages ne permet pas de configurer.
+    -->
+    <meta
+      http-equiv="Content-Security-Policy"
+      content="default-src 'self';
+               base-uri 'self';
+               object-src 'none';
+               form-action 'none';
+               img-src 'self' data: blob:;
+               font-src 'self';
+               style-src 'self' 'unsafe-inline';
+               script-src 'self' 'wasm-unsafe-eval' blob:;
+               worker-src 'self' blob:;
+               connect-src 'self' blob: data:;"
+    />
   </head>
   <body class="bg-slate-50 text-ink antialiased">
     <div id="root"></div>

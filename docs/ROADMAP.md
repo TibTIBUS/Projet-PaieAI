@@ -24,10 +24,14 @@ où vérifier qu'un abonnement est actif. Deux options compatibles avec l'héber
 gratuit :
 
 **Option A — fonction serverless de vérification (recommandée).**
-Netlify Functions ou Cloudflare Workers, tous deux gratuits dans les volumes attendus.
-Stripe encaisse et émet une licence signée ; la fonction vérifie la signature ; le
-navigateur conserve le jeton. Aucun bulletin ne transite : seule la licence circule.
-Le modèle de confidentialité reste intact.
+Un Cloudflare Worker, gratuit dans les volumes attendus. Stripe encaisse et émet une
+licence signée ; la fonction vérifie la signature ; le navigateur conserve le jeton.
+Aucun bulletin ne transite : seule la licence circule.
+
+Attention : cet appel serait le **premier** appel réseau de l'application. Il faudra
+élargir la directive `connect-src` de la politique de sécurité de contenu au seul
+domaine de vérification, et le mentionner sur la page Confidentialité. C'est une
+concession réelle au modèle actuel, à documenter plutôt qu'à dissimuler.
 
 **Option B — licence signée hors ligne.**
 Une paire de clés asymétriques : la clé privée signe les licences lors de l'achat, la clé
