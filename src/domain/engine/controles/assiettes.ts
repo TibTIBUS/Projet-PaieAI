@@ -122,7 +122,7 @@ export const controleTranches: Controle = {
               confiance: params.fiabilite === 'verifie' ? 'probable' : 'a_verifier',
               explication:
                 `Pour un brut de ${euros(remuneration)} et un plafond de ${euros(params.plafondMensuelSS)}, ` +
-                `${nomTranche.toLowerCase()} devrait être de ${euros(attendue)}. Le bulletin retient ${euros(ligne.base)}.` +
+                `la ${nomTranche.toLowerCase()} devrait être de ${euros(attendue)}. Le bulletin retient ${euros(ligne.base)}.` +
                 (impact > 0 ? ` Cela vous coûte ${euros(impact)} ce mois-ci.` : ''),
               detail:
                 `Tranche 1 attendue : ${euros(attendues.t1)} — tranche 2 attendue : ${euros(attendues.t2)}. ` +
@@ -144,10 +144,10 @@ export const controleTranches: Controle = {
       }
     };
 
-    verifier('RETRAITE_COMP_T1', attendues.t1, 'La tranche 1');
-    verifier('CEG_T1', attendues.t1, 'La tranche 1');
-    verifier('RETRAITE_COMP_T2', attendues.t2, 'La tranche 2');
-    verifier('CEG_T2', attendues.t2, 'La tranche 2');
+    verifier('RETRAITE_COMP_T1', attendues.t1, 'Tranche 1');
+    verifier('CEG_T1', attendues.t1, 'Tranche 1');
+    verifier('RETRAITE_COMP_T2', attendues.t2, 'Tranche 2');
+    verifier('CEG_T2', attendues.t2, 'Tranche 2');
     return anomalies;
   },
 };

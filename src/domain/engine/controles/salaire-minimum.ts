@@ -1,7 +1,7 @@
 import type { Anomalie } from '../../types';
 import { arrondi } from '../../parsing/montants';
 import type { Controle } from '../types';
-import { brut, euros, finaliser, REF_PRESCRIPTION, tauxHoraireDeBase } from '../utils';
+import { brut, euros, finaliser, REF_PRESCRIPTION, tauxHoraire, tauxHoraireDeBase } from '../utils';
 
 /* ------------------------------------------------------------------ */
 /* SMI-01 — taux horaire inférieur au SMIC                             */
@@ -40,11 +40,11 @@ export const controleSmicHoraire: Controle = {
           categorie: 'salaire_minimum',
           confiance: params.fiabilite === 'verifie' ? 'certaine' : 'a_verifier',
           explication:
-            `Votre taux horaire est de ${taux.toFixed(4)} € alors que le SMIC s’élève à ` +
-            `${params.smicHoraire.toFixed(2)} € sur cette période. ` +
+            `Votre taux horaire est de ${tauxHoraire(taux)} alors que le SMIC s’élève à ` +
+            `${tauxHoraire(params.smicHoraire)} sur cette période. ` +
             `Il vous manque environ ${euros(manque)} de salaire brut ce mois-ci.`,
           detail:
-            `Taux horaire constaté ${taux.toFixed(4)} € — SMIC horaire ${params.smicHoraire.toFixed(2)} € ` +
+            `Taux horaire constaté ${tauxHoraire(taux)} — SMIC horaire ${tauxHoraire(params.smicHoraire)} ` +
             `(source : ${params.sources[0]}). Base retenue : ${heures} heures.` +
             (params.fiabilite !== 'verifie'
               ? ' ⚠️ La valeur du SMIC pour cette période n’est pas vérifiée dans l’application.'

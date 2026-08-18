@@ -3,7 +3,7 @@ import { arrondi } from '../../parsing/montants';
 import type { Controle } from '../types';
 import {
   aUneLigne, effectif, euros, finaliser, ligneParCode, REF_PRESCRIPTION,
-  severiteSelonEcart, tauxHoraireDeBase,
+  severiteSelonEcart, tauxHoraire, tauxHoraireDeBase,
 } from '../utils';
 
 /* ------------------------------------------------------------------ */
@@ -55,12 +55,12 @@ export const controleMajorationHeuresSupp: Controle = {
             confiance: 'probable',
             explication:
               `Ces heures sont annoncées majorées à ${majorationAnnoncee} %, mais elles sont payées ` +
-              `${tauxPaye.toFixed(4)} € contre ${tauxBase.toFixed(4)} € pour une heure normale, ` +
+              `${tauxHoraire(tauxPaye)} contre ${tauxHoraire(tauxBase)} pour une heure normale, ` +
               `soit une majoration réelle de ${majorationReelle} %. ` +
               `Il vous manque ${euros(manque)} sur ce bulletin.`,
             detail:
-              `${hs.nombre} h à ${tauxPaye.toFixed(4)} € = ${euros(hs.montant)}. ` +
-              `Au taux dû de ${tauxDu.toFixed(4)} € (${majorationDue} % de majoration), ` +
+              `${hs.nombre} h à ${tauxHoraire(tauxPaye)} = ${euros(hs.montant)}. ` +
+              `Au taux dû de ${tauxHoraire(tauxDu)} (${majorationDue} % de majoration), ` +
               `le montant serait de ${euros(arrondi(tauxDu * hs.nombre))}.`,
             attendu: arrondi(tauxDu * hs.nombre),
             constate: hs.montant,
@@ -281,9 +281,9 @@ export const controleDeductionForfaitaire: Controle = {
           confiance: 'a_verifier',
           explication:
             `Avec un effectif de ${eff} salariés, l’employeur bénéficie d’une déduction de ` +
-            `${bareme.montantParHeure.toFixed(2)} € par heure supplémentaire, soit ${euros(montant)} ce mois-ci. ` +
+            `${tauxHoraire(bareme.montantParHeure)} par heure supplémentaire, soit ${euros(montant)} ce mois-ci. ` +
             'Cette déduction ne change pas votre net : elle est signalée à titre informatif, notamment si vous êtes vous-même employeur.',
-          detail: `${nbHeures} heures supplémentaires × ${bareme.montantParHeure.toFixed(2)} € = ${euros(montant)}.`,
+          detail: `${nbHeures} heures supplémentaires × ${tauxHoraire(bareme.montantParHeure)} = ${euros(montant)}.`,
           attendu: montant,
           constate: 0,
           references: [{ texte: 'Article L.241-18 du Code de la sécurité sociale' }],
@@ -343,8 +343,8 @@ export const controleHeuresComplementaires: Controle = {
               `Toute heure complémentaire accomplie par un salarié à temps partiel doit être majorée d’au moins ` +
               `${majorationMin} %. La majoration constatée est de ${majorationReelle} %. Il manque ${euros(manque)}.`,
             detail:
-              `${hc.nombre} h à ${tauxPaye.toFixed(4)} € — taux dû ${tauxDu.toFixed(4)} € ` +
-              `(taux de base ${tauxBase.toFixed(4)} € majoré de ${majorationMin} %).`,
+              `${hc.nombre} h à ${tauxHoraire(tauxPaye)} — taux dû ${tauxHoraire(tauxDu)} ` +
+              `(taux de base ${tauxHoraire(tauxBase)} majoré de ${majorationMin} %).`,
             attendu: arrondi(tauxDu * hc.nombre),
             constate: hc.montant,
             impactMensuel: manque,
@@ -529,11 +529,11 @@ export const controleAbsences: Controle = {
             categorie: 'temps_travail',
             confiance: 'probable',
             explication:
-              `L’absence est retenue à ${tauxRetenue.toFixed(4)} € de l’heure alors que votre salaire de base ` +
-              `est payé ${tauxBase.toFixed(4)} € de l’heure. La retenue doit être strictement proportionnelle : ` +
+              `L’absence est retenue à ${tauxHoraire(tauxRetenue)} de l’heure alors que votre salaire de base ` +
+              `est payé ${tauxHoraire(tauxBase)} de l’heure. La retenue doit être strictement proportionnelle : ` +
               `${euros(excedent)} de trop vous sont retenus.`,
             detail:
-              `Retenue : ${Math.abs(ligne.nombre)} h × ${tauxRetenue.toFixed(4)} € = ${euros(Math.abs(ligne.montant))}. ` +
+              `Retenue : ${Math.abs(ligne.nombre)} h × ${tauxHoraire(tauxRetenue)} = ${euros(Math.abs(ligne.montant))}. ` +
               `Au taux de base : ${euros(arrondi(tauxBase * Math.abs(ligne.nombre)))}.`,
             attendu: arrondi(tauxBase * Math.abs(ligne.nombre)),
             constate: Math.abs(ligne.montant),

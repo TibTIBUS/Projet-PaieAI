@@ -150,6 +150,11 @@ export function euros(v: number): string {
   return `${v.toLocaleString('fr-FR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} €`;
 }
 
+/** Taux horaire : deux décimales au minimum, quatre au maximum. */
+export function tauxHoraire(v: number): string {
+  return `${v.toLocaleString('fr-FR', { minimumFractionDigits: 2, maximumFractionDigits: 4 })} €`;
+}
+
 export function pourcent(v: number): string {
   return `${v.toLocaleString('fr-FR', { minimumFractionDigits: 2, maximumFractionDigits: 3 })} %`;
 }
