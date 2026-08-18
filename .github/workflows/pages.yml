@@ -1,0 +1,64 @@
+name: Déploiement GitHub Pages
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+# Un seul déploiement à la fois ; les runs en attente sont remplacés.
+concurrency:
+  group: pages
+  cancel-in-progress: false
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+jobs:
+  construire:
+    name: Construire le site
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: npm
+
+      - name: Installer les dépendances
+        run: npm ci
+
+      - name: Configurer Pages
+        id: pages
+        uses: actions/configure-pages@v5
+        with:
+          # Active GitHub Pages sur le dépôt si ce n'est pas déjà fait.
+          enablement: true
+
+      - name: Construire
+        run: npm run build
+        env:
+          # Le site est servi depuis https://<compte>.github.io/<dépôt>/
+          VITE_BASE: ${{ steps.pages.outputs.base_path }}/
+
+      - name: Repli SPA
+        # GitHub Pages sert 404.html pour toute adresse inconnue : en y plaçant
+        # l'application, le routage côté client fonctionne sur les liens directs.
+        run: cp dist/index.html dist/404.html
+
+      - uses: actions/upload-pages-artifact@v3
+        with:
+          path: dist
+
+  deployer:
+    name: Déployer
+    needs: construire
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deploiement.outputs.page_url }}
+    steps:
+      - id: deploiement
+        uses: actions/deploy-pages@v4

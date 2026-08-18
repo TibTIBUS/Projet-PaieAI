@@ -1,0 +1,47 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  html {
+    scroll-behavior: smooth;
+  }
+  body {
+    @apply bg-slate-50 text-ink;
+    font-feature-settings: 'tnum' 0;
+  }
+  /* Les montants s'alignent mieux en chiffres tabulaires. */
+  .tabulaire {
+    font-variant-numeric: tabular-nums;
+  }
+}
+
+@layer components {
+  .carte {
+    @apply rounded-xl border border-slate-200 bg-white shadow-card;
+  }
+  .bouton {
+    @apply inline-flex items-center justify-center gap-2 rounded-lg px-4 py-2.5 text-sm font-semibold
+           transition focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2
+           focus-visible:outline-brand-600 disabled:cursor-not-allowed disabled:opacity-50;
+  }
+  .bouton-principal {
+    @apply bouton bg-brand-600 text-white hover:bg-brand-700 active:bg-brand-800;
+  }
+  .bouton-secondaire {
+    @apply bouton border border-slate-300 bg-white text-ink-soft hover:border-slate-400 hover:bg-slate-50;
+  }
+  .bouton-discret {
+    @apply bouton text-ink-mute hover:bg-slate-100 hover:text-ink;
+  }
+  .champ {
+    @apply w-full rounded-lg border border-slate-300 px-3 py-2 text-sm
+           focus:border-brand-500 focus:outline-none focus:ring-2 focus:ring-brand-100;
+  }
+  .etiquette {
+    @apply mb-1.5 block text-sm font-medium text-ink-soft;
+  }
+  .lien {
+    @apply text-brand-700 underline decoration-brand-200 underline-offset-2 hover:decoration-brand-500;
+  }
+}
