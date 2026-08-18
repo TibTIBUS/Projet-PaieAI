@@ -79,13 +79,41 @@ Le protocole de validation par un expert-comptable est décrit dans
 
 ## Déploiement
 
-Le site est un ensemble de fichiers statiques : n'importe quel hébergeur gratuit convient
-(Netlify, Cloudflare Pages, GitHub Pages, Vercel).
+Le site est un ensemble de fichiers statiques : n'importe quel hébergeur gratuit convient.
+Deux cibles sont préconfigurées.
 
-**Netlify** — la configuration est déjà dans [`netlify.toml`](netlify.toml) :
-commande `npm run build`, dossier publié `dist`, redirection SPA et en-têtes de sécurité
-inclus. Connectez le dépôt sur [netlify.com](https://app.netlify.com/start), aucun réglage
-supplémentaire n'est nécessaire.
+### GitHub Pages (gratuit sur dépôt public)
+
+Le workflow [`.github/workflows/pages.yml`](.github/workflows/pages.yml) construit et
+publie le site à chaque `push` sur `main`. Il active GitHub Pages tout seul au premier
+passage, injecte le bon chemin de base et dépose un `404.html` pour que le routage côté
+client fonctionne sur les liens directs.
+
+Deux prérequis, à faire une fois :
+
+1. **Rendre le dépôt public** — *Settings* → *General* → *Change repository visibility*.
+   GitHub Pages n'est gratuit que sur les dépôts publics.
+2. **Amener le code sur `main`** — le workflow s'y déclenche. L'environnement
+   `github-pages` restreint par défaut les déploiements à la branche par défaut.
+
+Le site est ensuite servi sur `https://<compte>.github.io/Projet-PaieAI/`.
+
+### Netlify
+
+La configuration est déjà dans [`netlify.toml`](netlify.toml) : commande `npm run build`,
+dossier publié `dist`, redirection SPA et en-têtes de sécurité inclus. Connectez le dépôt
+sur [netlify.com](https://app.netlify.com/start) — aucun réglage supplémentaire, et le
+site est servi depuis la racine du domaine.
+
+### Chemin de base
+
+Le build lit la variable `VITE_BASE` (`/` par défaut) : c'est ce qui permet au même code
+de fonctionner à la racine d'un domaine comme sous un sous-chemin.
+
+```bash
+npm run build                            # racine : https://exemple.fr/
+VITE_BASE=/Projet-PaieAI/ npm run build  # sous-chemin : https://compte.github.io/Projet-PaieAI/
+```
 
 ## Feuille de route
 

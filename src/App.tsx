@@ -14,6 +14,10 @@ const Dossier = lazy(() =>
   import('@/ui/pages/Dossier').then((m) => ({ default: m.Dossier })),
 );
 
+// `BASE_URL` vaut « / » ou « /Projet-PaieAI/ » selon l'hébergement : le routeur
+// doit en tenir compte, sans la barre oblique finale.
+const basename = import.meta.env.BASE_URL.replace(/\/$/, '');
+
 const routeur = createBrowserRouter([
   {
     path: '/',
@@ -36,7 +40,7 @@ const routeur = createBrowserRouter([
       { path: '*', element: <Vide titre="Page introuvable">Cette adresse ne correspond à aucune page.</Vide> },
     ],
   },
-]);
+], { basename: basename || undefined });
 
 export function App() {
   return <RouterProvider router={routeur} />;
